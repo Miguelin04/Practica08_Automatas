@@ -1,16 +1,5 @@
 import re
-
-class Nodo:
-    def __init__(self, valor, hijos=None):
-        self.valor = valor
-        self.hijos = hijos if hijos else []
-
-    def __str__(self, nivel=0):
-        # Representación gráfica básica del árbol con tabulaciones
-        ret = "  " * nivel + "|- " + self.valor + "\n"
-        for hijo in self.hijos:
-            ret += hijo.__str__(nivel + 1)
-        return ret
+from models.nodo import Nodo
 
 class AnalizadorSintactico:
     def __init__(self, cadena):
@@ -32,7 +21,6 @@ class AnalizadorSintactico:
         self.pos += 1
 
     def analizar(self):
-        print(f"\nAnalizando expresión: {self.cadena_original}")
         arbol = self.Exp()
         
         # Si terminamos de armar el árbol pero sobraron tokens, hay un error de sintaxis
@@ -94,31 +82,3 @@ class AnalizadorSintactico:
             
         else:
             raise Exception(f"Error de sintaxis: Se esperaba 'id', '~' o '(' pero se encontró '{token}'")
-
-# --- BLOQUE DE PRUEBAS ---
-if __name__ == '__main__':
-    # Ejemplos sacados de la práctica
-    expresiones_prueba = [
-        "id",
-        "id | id",
-        "id & ~id",
-        "id | id & ~id",
-        "~(id & id) | id",
-        "id & id |"  # Esta fallará a propósito para probar validación
-    ]
-
-    print("=== VALIDADOR DE GRAMÁTICA LIBRE DE CONTEXTO (CFG) ===")
-    print("Variables: Exp, Term, Factor")
-    print("Terminales: |, &, ~, (, ), id")
-    
-    for expresion in expresiones_prueba:
-        print("-" * 50)
-        analizador = AnalizadorSintactico(expresion)
-        try:
-            arbol_derivacion = analizador.analizar()
-            print("Resultado: [VÁLIDO] La cadena pertenece al lenguaje.")
-            print("Árbol de derivación sintáctica:\n")
-            print(arbol_derivacion)
-        except Exception as e:
-            print(f"Resultado: [INVÁLIDO] La cadena no pertenece al lenguaje.")
-            print(str(e))
