@@ -3,34 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--
+        Título de la aplicación: Analizador de Expresiones Booleanas.
+        Es un frontend que se conecta al backend FastAPI (puerto 8000)
+        para analizar sintácticamente expresiones booleanas y visualizar
+        tanto la tabla de tokens como el árbol de derivación con D3.js.
+    -->
     <title>Analizador de Expresiones Booleanas</title>
-    <!-- Fuentes de Google -->
+
+    <!-- Fuente principal: Outfit de Google Fonts, moderna y legible -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- D3.js para dibujar el árbol -->
+
+    <!--
+        D3.js v7: Librería para visualización de datos.
+        Se usa para dibujar el árbol de derivación como un diagrama jerárquico
+        con nodos circulares y líneas curvas (enlaces padre-hijo).
+    -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <!-- Estilos de la aplicación (glassmorphism dark theme) -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <!--
+        Fondos animados (blobs): Elementos decorativos con efecto blur
+        que flotan lentamente para dar profundidad al diseño glassmorphism.
+    -->
     <div class="background-elements">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
 
+    <!--
+        CONTENEDOR PRINCIPAL: Contiene todas las secciones de la página
+        en un layout vertical con separación (gap: 2.5rem).
+    -->
     <main class="container">
+
+        <!-- ============================================================
+             HEADER: Título y descripción del proyecto
+             ============================================================ -->
         <header>
             <h1>Analizador de Expresiones <span>Booleanas</span></h1>
-            <p>Evalúa cadenas basadas en Gramática Libre de Contexto y genera su árbol de derivación sintáctica.</p>
+            <p>
+                Evalúa cadenas basadas en Gramática Libre de Contexto
+                y genera su árbol de derivación sintáctica.
+            </p>
         </header>
 
+        <!-- ============================================================
+             SECCIÓN DE ENTRADA: Formulario para ingresar la expresión
+             ============================================================ -->
         <section class="input-section glass-panel">
             <form id="parse-form">
                 <div class="input-group">
-                    <input type="text" id="expression-input" placeholder="Ej: id | id & ~id" autocomplete="off" required>
+                    <!--
+                        Campo de texto donde el usuario escribe la expresión.
+                        Los placeholders muestran ejemplos de sintaxis válida.
+                    -->
+                    <input type="text" id="expression-input"
+                           placeholder="Ej: id | id & ~id"
+                           autocomplete="off" required>
+
+                    <!-- Botón para enviar la expresión al backend -->
                     <button type="submit" id="submit-btn">
                         <span>Analizar</span>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        <!-- Icono SVG de flecha hacia la derecha -->
+                        <svg width="24" height="24" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2"
+                             stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
                     </button>
                 </div>
+
+                <!--
+                    Botones de ejemplo: El usuario puede hacer clic para
+                    cargar expresiones predefinidas y analizarlas al instante.
+                -->
                 <div class="examples-container">
                     <span class="examples-label">Ejemplos:</span>
                     <button type="button" class="example-btn">id</button>
@@ -39,20 +92,72 @@
                     <button type="button" class="example-btn">id | id & ~id</button>
                     <button type="button" class="example-btn">~(id & id) | id</button>
                 </div>
+
+                <!--
+                    Mensaje de estado: Muestra "Éxito" en verde o el error
+                    del backend en rojo, con animación de aparición.
+                -->
                 <div id="status-message" class="status-message hidden"></div>
             </form>
         </section>
 
+        <!-- ============================================================
+             SECCIÓN DE TABLA DE TOKENS: Resultado del análisis léxico
+             ============================================================
+             Muestra una tabla con dos columnas:
+               - TOKEN: Tipo gramatical (VARIABLE, OPERADOR_OR, etc.)
+               - LEXEMA: Texto original extraído de la expresión
+             Se oculta inicialmente y aparece cuando hay un análisis exitoso.
+        -->
+        <section id="token-section" class="glass-panel">
+            <h2>Tabla de Tokens</h2>
+            <div class="token-table-wrapper">
+                <table id="token-table">
+                    <thead>
+                        <tr>
+                            <th>Token</th>
+                            <th>Lexema</th>
+                        </tr>
+                    </thead>
+                    <!--
+                        El cuerpo de la tabla (tbody) se llena dinámicamente
+                        desde JavaScript con los datos de la respuesta del backend.
+                    -->
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ============================================================
+             SECCIÓN DEL ÁRBOL: Visualización del árbol de derivación
+             ============================================================
+             El contenedor #tree-container alberga un SVG generado por D3.js
+             que dibuja el árbol jerárquico de las producciones gramaticales.
+             Incluye zoom interactivo (scroll para acercar/alejar).
+        -->
         <section class="tree-section glass-panel">
             <h2>Árbol de Derivación</h2>
             <div class="tree-container" id="tree-container">
+                <!--
+                    Estado vacío: Se muestra cuando no hay un árbol cargado.
+                    Desaparece al dibujar el SVG y reaparece al limpiar.
+                -->
                 <div id="empty-state">
                     <p>Ingresa una expresión arriba para visualizar el árbol aquí.</p>
                 </div>
             </div>
         </section>
+
     </main>
 
+    <!--
+        Script principal: Contiene toda la lógica del frontend:
+        - Envío del formulario al backend via fetch()
+        - Renderizado de la tabla de tokens
+        - Dibujo del árbol de derivación con D3.js
+        - Manejo de errores y estado vacío
+    -->
     <script src="script.js"></script>
+
 </body>
 </html>
