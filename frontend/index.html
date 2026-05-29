@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analizador de Expresiones Booleanas</title>
+    <!-- Fuentes de Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- D3.js para dibujar el árbol -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <main class="container">
+        <header>
+            <h1>Analizador de Expresiones <span>Booleanas</span></h1>
+            <p>Evalúa cadenas basadas en Gramática Libre de Contexto y genera su árbol de derivación sintáctica.</p>
+        </header>
+
+        <section class="input-section glass-panel">
+            <form id="parse-form">
+                <div class="input-group">
+                    <input type="text" id="expression-input" placeholder="Ej: id | id & ~id" autocomplete="off" required>
+                    <button type="submit" id="submit-btn">
+                        <span>Analizar</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    </button>
+                </div>
+                <div class="examples-container">
+                    <span class="examples-label">Ejemplos:</span>
+                    <button type="button" class="example-btn">id</button>
+                    <button type="button" class="example-btn">id | id</button>
+                    <button type="button" class="example-btn">id & ~id</button>
+                    <button type="button" class="example-btn">id | id & ~id</button>
+                    <button type="button" class="example-btn">~(id & id) | id</button>
+                </div>
+                <div id="status-message" class="status-message hidden"></div>
+            </form>
+        </section>
+
+        <section class="tree-section glass-panel">
+            <h2>Árbol de Derivación</h2>
+            <div class="tree-container" id="tree-container">
+                <div id="empty-state">
+                    <p>Ingresa una expresión arriba para visualizar el árbol aquí.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

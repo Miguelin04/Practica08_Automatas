@@ -1,32 +1,33 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from core.analizador import AnalizadorSintactico
 
-def main():
-    # Ejemplos sacados de la práctica
-    expresiones_prueba = [
-        "id",
-        "id | id",
-        "id & ~id",
-        "id | id & ~id",
-        "~(id & id) | id",
-        "id & id |"  # Esta fallará a propósito para probar validación
-    ]
+app = FastAPI(title="CFG Parser API")
 
-    print("=== VALIDADOR DE GRAMÁTICA LIBRE DE CONTEXTO (CFG) ===")
-    print("Variables: Exp, Term, Factor")
-    print("Terminales: |, &, ~, (, ), id")
-    
-    for expresion in expresiones_prueba:
-        print("-" * 50)
-        print(f"\nAnalizando expresión: {expresion}")
-        analizador = AnalizadorSintactico(expresion)
-        try:
-            arbol_derivacion = analizador.analizar()
-            print("Resultado: [VÁLIDO] La cadena pertenece al lenguaje.")
-            print("Árbol de derivación sintáctica:\n")
-            print(arbol_derivacion)
-        except Exception as e:
-            print(f"Resultado: [INVÁLIDO] La cadena no pertenece al lenguaje.")
-            print(str(e))
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-if __name__ == '__main__':
-    main()
+class ExpressionRequest(BaseModel):
+    expression: str
+
+@app.post("/api/parse")
+def parse_expression(request: ExpressionRequest):
+    analizador = AnalizadorSintactico(request.expression)
+    try:
+        arbol_derivacion = analizador.analizar()
+        return {
+            "valid": True,
+            "tree": arbol_derivacion.to_dict()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

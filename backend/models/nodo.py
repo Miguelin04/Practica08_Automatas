@@ -9,3 +9,9 @@ class Nodo:
         for hijo in self.hijos:
             ret += hijo.__str__(nivel + 1)
         return ret
+
+    def to_dict(self):
+        return {
+            "name": self.valor,
+            "children": [hijo.to_dict() for hijo in self.hijos]
+        }
