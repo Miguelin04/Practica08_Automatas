@@ -276,6 +276,28 @@ button:active {
 }
 
 /* ====================================================================
+   FILA DE TABLAS (Tokens + Derivación lado a lado)
+   --------------------------------------------------------------------
+   Contenedor flex que coloca ambas tablas en la misma fila.
+   En móviles se apilan verticalmente.
+   ==================================================================== */
+.tables-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.tables-row .glass-panel {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 768px) {
+    .tables-row {
+        flex-direction: column;
+    }
+}
+
+/* ====================================================================
    TABLA DE TOKENS
    --------------------------------------------------------------------
    Tabla estilizada que muestra el resultado del análisis léxico.
@@ -341,6 +363,83 @@ button:active {
 #token-table tbody td:last-child {
     font-weight: 600;
     color: var(--text-primary);
+}
+
+/* ====================================================================
+   TABLA DE DERIVACIÓN
+   --------------------------------------------------------------------
+   Tabla que muestra paso a paso la derivación por la izquierda:
+   # | Producción | Forma sentencial.
+   Misma línea visual que la tabla de tokens.
+   ==================================================================== */
+#derivation-section {
+    display: none;
+}
+
+#derivation-section h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.derivation-table-wrapper {
+    overflow-x: auto;
+}
+
+#derivation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Outfit', monospace;
+}
+
+#derivation-table thead th {
+    text-align: left;
+    padding: 0.9rem 1.2rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(139, 92, 246, 0.08));
+    border-bottom: 2px solid var(--glass-border);
+}
+
+#derivation-table tbody td {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    color: var(--text-primary);
+}
+
+#derivation-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+#derivation-table tbody tr:hover {
+    background: rgba(59, 130, 246, 0.05);
+}
+
+/* Columna #: azul primario, seminegrita */
+#derivation-table tbody td:first-child {
+    color: var(--accent-primary);
+    font-weight: 500;
+    width: 3rem;
+}
+
+/* Columna Producción: blanco, seminegrita */
+#derivation-table tbody td:nth-child(2) {
+    font-weight: 500;
+    font-family: 'Outfit', monospace;
+}
+
+/* Columna Forma sentencial: blanco, negrita */
+#derivation-table tbody td:nth-child(3) {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Destacar el paso final (la expresión completa: solo terminales) */
+#derivation-table tbody tr:last-child td {
+    color: var(--success);
 }
 
 /* ====================================================================

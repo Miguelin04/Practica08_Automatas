@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const emptyState = document.getElementById('empty-state');     // Estado vacío del árbol
     const treeContainer = document.getElementById('tree-container'); // Contenedor SVG del árbol
     const tokenSection = document.getElementById('token-section'); // Sección de la tabla de tokens
+    const derivationSection = document.getElementById('derivation-section'); // Sección de la tabla de derivación
 
     // ------------------------------------------------------------------
     // Evento principal: Envío del formulario
@@ -62,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Renderizar tabla de tokens con los datos del backend
                 drawTokenTable(data.tokens);
 
+                // Renderizar tabla de derivación paso a paso
+                drawDerivationTable(data.derivation);
+
                 // Dibujar árbol de derivación con D3.js
                 drawTree(data.tree);
 
@@ -71,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // ------------------------------------------------------
                 showStatus(`Error: ${data.detail}`, 'error');
                 clearTokenTable();
+                clearDerivationTable();
                 clearTree();
             }
 
@@ -80,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ------------------------------------------------------
             showStatus('Error de conexión con el servidor. ¿Está corriendo el backend?', 'error');
             clearTokenTable();
+            clearDerivationTable();
             clearTree();
         }
     });
@@ -126,6 +132,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const tbody = document.querySelector('#token-table tbody');
         tbody.innerHTML = '';
         tokenSection.style.display = 'none';
+    }
+
+    // ------------------------------------------------------------------
+    // drawDerivationTable: Renderiza la tabla de derivación paso a paso
+    // ------------------------------------------------------------------
+    /**
+     * Construye las filas del <tbody> de la tabla de derivación.
+     * Cada fila muestra: número de paso, producción aplicada,
+     * y la forma sentencial resultante.
+     *
+     * @param {Array<{paso: number, produccion: string, forma: string}>} steps -
+     *        Lista de pasos de la derivación por la izquierda.
+     */
+    function drawDerivationTable(steps) {
+        const tbody = document.querySelector('#derivation-table tbody');
+        tbody.innerHTML = '';
+
+        steps.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${s.paso}</td><td>${s.produccion}</td><td>${s.forma}</td>`;
+            tbody.appendChild(tr);
+        });
+
+        derivationSection.style.display = 'block';
+    }
+
+    // ------------------------------------------------------------------
+    // clearDerivationTable: Oculta y limpia la tabla de derivación
+    // ------------------------------------------------------------------
+    function clearDerivationTable() {
+        const tbody = document.querySelector('#derivation-table tbody');
+        tbody.innerHTML = '';
+        derivationSection.style.display = 'none';
     }
 
     // ------------------------------------------------------------------

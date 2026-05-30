@@ -101,32 +101,58 @@
             </form>
         </section>
 
-        <!-- ============================================================
-             SECCIÓN DE TABLA DE TOKENS: Resultado del análisis léxico
-             ============================================================
-             Muestra una tabla con dos columnas:
-               - TOKEN: Tipo gramatical (VARIABLE, OPERADOR_OR, etc.)
-               - LEXEMA: Texto original extraído de la expresión
-             Se oculta inicialmente y aparece cuando hay un análisis exitoso.
-        -->
-        <section id="token-section" class="glass-panel">
-            <h2>Tabla de Tokens</h2>
-            <div class="token-table-wrapper">
-                <table id="token-table">
-                    <thead>
-                        <tr>
-                            <th>Token</th>
-                            <th>Lexema</th>
-                        </tr>
-                    </thead>
-                    <!--
-                        El cuerpo de la tabla (tbody) se llena dinámicamente
-                        desde JavaScript con los datos de la respuesta del backend.
-                    -->
-                    <tbody></tbody>
-                </table>
-            </div>
-        </section>
+        <div class="tables-row">
+            <!-- ============================================================
+                 TABLA DE TOKENS: Resultado del análisis léxico
+                 ============================================================
+                 Muestra una tabla con dos columnas:
+                   - TOKEN: Tipo gramatical (VARIABLE, OPERADOR_OR, etc.)
+                   - LEXEMA: Texto original extraído de la expresión
+                 Se oculta inicialmente y aparece cuando hay un análisis exitoso.
+            -->
+            <section id="token-section" class="glass-panel">
+                <h2>Tabla de Tokens</h2>
+                <div class="token-table-wrapper">
+                    <table id="token-table">
+                        <thead>
+                            <tr>
+                                <th>Token</th>
+                                <th>Lexema</th>
+                            </tr>
+                        </thead>
+                        <!--
+                            El cuerpo de la tabla (tbody) se llena dinámicamente
+                            desde JavaScript con los datos de la respuesta del backend.
+                        -->
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 TABLA DE DERIVACIÓN: Paso a paso de cómo se deriva la expresión
+                 ============================================================
+                 Muestra en cada fila: el número de paso, la regla gramatical
+                 que se aplicó, y cómo va quedando la expresión parcial.
+                 Al llegar al último paso, la expresión contiene solo los
+                 símbolos originales (variables y operadores).
+            -->
+            <section id="derivation-section" class="glass-panel">
+                <h2>Tabla de Derivación</h2>
+                <div class="derivation-table-wrapper">
+                    <table id="derivation-table">
+                        <thead>
+                            <tr>
+                                <th>Paso</th>
+                                <th>Transformación</th>
+                                <th>Cadena Resultante</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
 
         <!-- ============================================================
              SECCIÓN DEL ÁRBOL: Visualización del árbol de derivación

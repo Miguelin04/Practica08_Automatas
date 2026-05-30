@@ -77,6 +77,12 @@ def parse_expression(request: ExpressionRequest):
                 {"tipo": "OPERADOR_AND","lexema": "&"},
                 {"tipo": "VARIABLE",    "lexema": "C"}
             ],
+            "derivation": [
+                {"paso": 0, "produccion": "-",           "forma": "Exp"},
+                {"paso": 1, "produccion": "Exp -> Exp | Term", "forma": "Term | Term"},
+                {"paso": 2, "produccion": "Term -> Factor",    "forma": "Factor | Term"},
+                ...
+            ],
             "tree": {
                 "name": "Exp -> Exp | Term",
                 "children": [...]
@@ -90,7 +96,7 @@ def parse_expression(request: ExpressionRequest):
         request: Objeto ExpressionRequest con el campo 'expression'.
 
     Returns:
-        dict: Con valid (bool), tokens (list), tree (dict).
+        dict: Con valid (bool), tokens (list), derivation (list), tree (dict).
 
     Raises:
         HTTPException 400: Si el análisis sintáctico falla.
@@ -102,6 +108,7 @@ def parse_expression(request: ExpressionRequest):
         return {
             "valid": True,
             "tokens": analizador.obtener_tokens(),
+            "derivation": analizador.obtener_derivacion(arbol_derivacion),
             "tree": arbol_derivacion.to_dict()
         }
     except Exception as e:

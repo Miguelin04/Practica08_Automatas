@@ -231,7 +231,7 @@ class AnalizadorSintactico:
                 "pero la expresión está incompleta"
             )
 
-        # Caso 2: Operador NOT '~' (unario, mayor precedencia)
+        # Caso 2: Operador NOT '~' (mayor precedencia)
         if token.tipo == 'OPERADOR_NOT':
             self.avanzar()
             return Nodo(
@@ -270,3 +270,58 @@ class AnalizadorSintactico:
                 f"Error de sintaxis: Se esperaba 'id', '~' o '(' "
                 f"pero se encontró '{token.valor}'"
             )
+
+
+    def obtener_derivacion(self, raiz):
+        """
+        Genera la secuencia de pasos de la derivación más a la izquierda
+        a partir del árbol de derivación construido por el parser.
+
+        La derivación parte del símbolo inicial 'Exp' y en cada paso reemplaza
+        el no terminal más a la izquierda por el lado derecho de la producción
+        que lo expande, hasta obtener la forma sentencial compuesta solo por
+        terminales (la expresión original).
+
+        Args:
+            raiz (Nodo): Raíz del árbol de derivación.
+
+        Returns:
+            list[dict]: Lista de pasos, cada uno con:
+                        - paso (int): Número de paso.
+                        - produccion (str): Producción aplicada en este paso.
+                        - forma (str): Forma sentencial resultante.
+        """
+        # Obtener el nombre simbólico de un nodo:
+        #   - Si tiene hijos, es su lado izquierdo (ej: "Exp -> Exp | Term" → "Exp")
+        #   - Si es terminal, es su valor literal (ej: "A", "|")
+        def symbol_name(nodo):
+            if nodo.hijos:
+                # Extraer el LHS antes de " -> "
+                return nodo.valor.split(' -> ')[0]
+            return nodo.valor
+
+        # Forma sentencial inicial: solo la raíz del árbol
+        forma = [raiz]
+        pasos = [{"paso": 0, "produccion": "-", "forma": symbol_name(raiz)}]
+
+        # Repetir mientras haya al menos un no terminal (nodo con hijos)
+        # en la forma sentencial actual
+        while True:
+            # Encontrar el primer (más a la izquierda) no terminal
+            idx = next((i for i, n in enumerate(forma) if n.hijos), None)
+            if idx is None:
+                break  # Ya no hay no terminales → derivación completa
+
+            nodo = forma[idx]
+
+            # Reemplazar el no terminal por sus hijos (RHS de la producción)
+            forma = forma[:idx] + nodo.hijos + forma[idx + 1:]
+
+            # Construir la forma sentencial como string
+            pasos.append({
+                "paso": len(pasos),
+                "produccion": nodo.valor,
+                "forma": " ".join(symbol_name(n) for n in forma)
+            })
+
+        return pasos
